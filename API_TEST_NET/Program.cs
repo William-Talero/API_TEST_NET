@@ -1,4 +1,6 @@
+using API_TEST_NET.Models;
 using API_TEST_NET.Services;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,7 +11,13 @@ builder.Services.AddScoped<IPostService, PostService>();
 
 builder.Services.AddHttpClient<IPostService, PostService>(c =>
 {
-    c.BaseAddress = new Uri("https://jsonplaceholder.typicode.com/posts");
+    c.BaseAddress = new Uri(builder.Configuration["BaseUrlPosts"]);
+});
+
+//Entity Framework
+builder.Services.AddDbContext<StoreContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
 builder.Services.AddControllers();
@@ -19,7 +27,7 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configure the HTTP request pipeline. 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
